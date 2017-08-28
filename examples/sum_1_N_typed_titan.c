@@ -11,12 +11,7 @@ static void sum_1_N_typed_titancall(lua_State *L)
     // Allocate stack
     // 1 -> arg(1)
     // 2 -> res(1)
-    {
-        if (!lua_checkstack(L, 2)) { titan_panic(); }
-        for (int i=2; i<=2; i++) {
-            lua_pushnil(L);
-        }
-    }
+    titan_grow_stack(L, 1, 2);
 
     // Function parameters
     
@@ -49,20 +44,15 @@ static void sum_1_N_typed_titancall(lua_State *L)
 static int sum_1_N_typed_luacall(lua_State *L)
 {
     // Check and fix arity of parameters
-    {
-        int nargs = lua_gettop(L);
-        
-        if (nargs > 1) {
-            titan_arity_error(L, __LINE__);
-        }
-        
-        if (nargs < 1) {
-            if (!lua_checkstack(L, 1)) { titan_panic(); }
-            for (int i=nargs+1; i <= 1; i++) {
-                lua_pushnil(L);
-            }
-        }
-        
+    
+    int nargs = lua_gettop(L);
+    
+    if (nargs > 1) {
+        titan_arity_error(L, __LINE__);
+    }
+    
+    if (nargs < 1) {
+        titan_grow_stack(L, nargs, 1);
     }
     
     // Check types of parameters

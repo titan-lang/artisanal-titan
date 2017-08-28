@@ -23,3 +23,16 @@ int titan_arity_error(lua_State *L, int line)
 {
     return luaL_error(L, "Titan arity error in C line %d", line);
 }
+
+void titan_shrink_stack(lua_State *L, int old_size, int new_size)
+{
+    lua_pop(L, old_size - new_size);
+}
+
+void titan_grow_stack(lua_State *L, int old_size, int new_size)
+{
+    if (!lua_checkstack(L, new_size)) { titan_panic(); }
+    for (int i=old_size+1; i <= new_size; i++) {
+        lua_pushnil(L);
+    }
+}
