@@ -17,3 +17,8 @@ Included functions:
     In addition to the plain Lua version and the typed Titan version I also
     made a dynamically-typed titan versino to check what speedup we get just
     removing the interpreter overhead.
+
+- fill_table
+
+    I made this function to check if I wasn't doing anything really stupid regarding
+    the garbage collection.

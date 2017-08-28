@@ -7,6 +7,7 @@ CPPFLAGS:= -I$(LUASRC)
 .PHONY: all clean
 
 all: \
+    fill_table_titan.so \
     sum_1_N_typed_titan.so \
     sum_1_N_dynamic_titan.so
 
@@ -17,8 +18,10 @@ clean:
 	$(CC) -shared $^ -o $@
 
 libtitan.o: libtitan.c libtitan.h
+fill_table_titan.o: fill_table_titan.c libtitan.h
 sum_1_N_dynamic_titan.o: sum_1_N_dynamic_titan.c libtitan.h
 sum_1_N_typed_titan.o: sum_1_N_typed_titan.c libtitan.h
 
+fill_table_titan.so: fill_table_titan.o libtitan.o
 sum_1_N_dynamic_titan.so : sum_1_N_dynamic_titan.o libtitan.o
 sum_1_N_typed_titan.so : sum_1_N_typed_titan.o libtitan.o
