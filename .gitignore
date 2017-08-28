@@ -1,0 +1,6 @@
+lua/src/lua
+lua/src/luac
+
+*.a
+*.o
+*.so
