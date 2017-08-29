@@ -34,7 +34,7 @@ static void sieve_titancall(lua_State *L)
         sethvalue(L, v, t);
         local_is_prime = t;
         
-        lua_checkGC(L);
+        luaC_checkGC(L);
     }
     
     {

@@ -19,11 +19,17 @@ static TValue *const_1 = &constants[1];
 static void sum_1_N_dynamic_titancall(lua_State *L)
 {
     // Allocate stack
+    // param N   -> 1
+    // local res -> 2
+    // local i   -> 3
+    // out[1]    -> 3
+    
     // 1 -> param[1] N
     // 2 -> local res
     // 3 -> local i
     // 4 -> return[1]
-    titan_grow_stack(L, 1, 2);
+    
+    titan_grow_stack(L, 1, 3);
 
     // Function parameters
 
@@ -34,7 +40,6 @@ static void sum_1_N_dynamic_titancall(lua_State *L)
         TValue *fr = const_0;
         setobj(L, to, fr);
     }
-    
     
     {
         {
@@ -95,29 +100,30 @@ static void sum_1_N_dynamic_titancall(lua_State *L)
     // Return results
 
     {
-        TValue *to = L->ci->func + 4;
-        TValue *fr = L->ci->func + 2;
-        setobj(L, to, fr);
+        TValue out1;
+        setobj(L, &out1, L->ci->func + 2);
+    
+        setobj(L, L->ci->func + 3, &out1);
     }
 }
 
 static int sum_1_N_dynamic_luacall(lua_State *L)
 {
-    // Check and fix arity of parameters
+    // Get parameters
     
-    int nargs = lua_gettop(L);
+    {
+        int nargs = lua_gettop(L);
     
-    if (nargs > 1) {
-        titan_shrink_stack(L, nargs, 1);
+        if (nargs > 1) {
+            titan_shrink_stack(L, nargs, 1);
+        }
+    
+        if (nargs < 1) {
+            titan_grow_stack(L, nargs, 1);
+        }
     }
     
-    if (nargs < 1) {
-        titan_grow_stack(L, nargs, 1);
-    }
-    
-    // Check types of parameters
-    
-    // Call internal representation
+    // Call internal representation and return
     
     sum_1_N_dynamic_titancall(L);
 

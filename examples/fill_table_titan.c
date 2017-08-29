@@ -7,21 +7,13 @@
 
 #include "libtitan.h"
 
-static void fill_table_titancall(lua_State *L)
+static void fill_table_titancall(lua_State *L, lua_Integer local_N)
 {
     // Allocate stack
-    // 1 -> arg(1)
-    // 2 -> xs
-    // 3 -> ret(1)
-    titan_grow_stack(L, 1, 3);
+    // 1 -> xs, ret(1)
+    titan_grow_stack(L, 0, 1);
 
     // Function parameters
-    
-    lua_Integer local_N;
-    {
-        TValue *v = L->ci->func + 1;
-        local_N = ivalue(v);
-    }
     
     // Function body
     
@@ -33,7 +25,7 @@ static void fill_table_titancall(lua_State *L)
         sethvalue(L, v, t);
         local_xs = t;
         
-        luaC_checkGC(L); // TODO: this can be optimized?
+        luaC_checkGC(L);
     }
     
     for (lua_Integer local_i=1; local_i <= local_N; local_i += 1) {
@@ -50,38 +42,33 @@ static void fill_table_titancall(lua_State *L)
     }
     
     // Return
-
-    {
-        TValue *to = L->ci->func + 3;
-        TValue *fr = L->ci->func + 2;
-        setobj(L, to, fr);
-    }
+    
+        // resize stack 1 -> 1
+        // stack[1] = stacl[1]
 }
 
 
 static int fill_table_luacall(lua_State *L)
 {
-    // Check and fix arity of parameters
-    int nargs = lua_gettop(L);
+    // Get parameters
     
-    if (nargs > 1) {
-        titan_arity_error(L, __LINE__);
-    }
-        
-    if (nargs < 1) {
-        titan_grow_stack(L, nargs, 1);
+    {
+        int nargs = lua_gettop(L);
+        if (nargs != 1) {
+            titan_arity_error(L, __LINE__);
+        }
     }
     
-    // Check parameter types
-    
+    lua_Integer local_N;
     {
         const TValue * v = L->ci->func + 1;
         if (!ttisinteger(v)) { titan_type_error(L, __LINE__); }
+        local_N = ivalue(v);
     }
     
-    // Run function and return
+    // Call internal implementation and return
 
-    fill_table_titancall(L);
+    fill_table_titancall(L, local_N);
 
     return 1;
 }

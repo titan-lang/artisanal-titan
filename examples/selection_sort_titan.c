@@ -11,7 +11,6 @@ static void selection_sort_titancall(lua_State *L)
 {
     // Allocate stack
     // 1 -> arg(1)
-    titan_grow_stack(L, 1, 1);
 
     // Function parameters
     
@@ -98,18 +97,15 @@ static void selection_sort_titancall(lua_State *L)
 
 static int selection_sort_luacall(lua_State *L)
 {
-    // Check and fix arity of parameters
-    int nargs = lua_gettop(L);
+    // Get parameters
     
-    if (nargs > 1) {
-        titan_arity_error(L, __LINE__);
-    }
-        
-    if (nargs < 1) {
-        titan_grow_stack(L, nargs, 1);
-    }
+    {
+        int nargs = lua_gettop(L);
     
-    // Check parameter types
+        if (nargs != 1) {
+            titan_arity_error(L, __LINE__);
+        }
+    }
     
     {
         const TValue * v = L->ci->func + 1;
