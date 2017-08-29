@@ -5,7 +5,6 @@
 #include "lgc.h"
 #include "ltable.h"
 
-
 #include "libtitan.h"
 
 static void selection_sort_titancall(lua_State *L)
