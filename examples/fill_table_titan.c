@@ -4,6 +4,9 @@
 #include "lapi.h"
 #include "lgc.h"
 #include "ltable.h"
+#include "lvm.h"
+
+#include "lobject.h"
 
 #include "libtitan.h"
 
@@ -36,8 +39,28 @@ static void fill_table_titancall(lua_State *L, lua_Integer local_N)
         }
         
         {
-            TValue v; setivalue(&v, tmp_1);
-            luaH_setint(L, local_xs, local_i, &v);
+            Table *t = local_xs;
+            lua_Integer k = local_i;
+            lua_Integer v = tmp_1;
+            const TValue *vt = L->ci->func + 2;
+            
+            unsigned int actual_i = l_castS2U(k) - 1;
+            unsigned int asize = t->sizearray;
+            
+            if (actual_i < asize) {
+                TValue *slot = &t->array[actual_i];
+                setivalue(slot, v);
+            } else if (actual_i < 2*asize) {
+                unsigned int hsize = sizenode(t);
+                luaH_resize(L, t, 2*asize, hsize);
+                TValue *slot = &t->array[actual_i];
+                setivalue(slot, v);
+            } else {
+                TValue *slot = (TValue *) luaH_getint(t, k);
+                TValue vk; setivalue(&vk, k);
+                TValue vv; setivalue(&vv, v);
+                luaV_finishset(L, vt, &vk, &vv, slot);
+            }
         }
     }
     

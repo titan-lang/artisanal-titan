@@ -4,6 +4,7 @@
 #include "lapi.h"
 #include "lgc.h"
 #include "ltable.h"
+#include "lvm.h"
 
 #include "libtitan.h"
 
@@ -38,16 +39,57 @@ static void sieve_titancall(lua_State *L)
     }
     
     {
-        TValue v; setbvalue(&v, 0);
-        luaH_setint(L, local_is_prime, 1, &v);
-    }
-
-    for (lua_Integer local_n = 2; local_n <= local_maxn; local_n += 1) {
-
-        {
-            TValue v; setbvalue(&v, 1);
-            luaH_setint(L, local_is_prime, local_n, &v);
+        Table *t = local_is_prime;
+        lua_Integer k = 1;
+        int v = 0;
+        const TValue *vt = L->ci->func + 2;
+        
+        unsigned int actual_i = l_castS2U(k) - 1;
+        unsigned int asize = t->sizearray;
+        
+        if (actual_i < asize) {
+            TValue *slot = &t->array[actual_i];
+            setbvalue(slot, v);
+        } else if (actual_i < 2*asize) {
+            unsigned int hsize = sizenode(t);
+            luaH_resize(L, t, 2*asize, hsize);
+            TValue *slot = &t->array[actual_i];
+            setbvalue(slot, v);
+        } else {
+            TValue *slot = (TValue *) luaH_getint(t, k);
+            TValue vk; setivalue(&vk, k);
+            TValue vv; setbvalue(&vv, v);
+            luaV_finishset(L, vt, &vk, &vv, slot);
         }
+    }
+    
+    
+    for (lua_Integer local_n = 2; local_n <= local_maxn; local_n += 1) {
+        {
+            Table *t = local_is_prime;
+            lua_Integer k = local_n;
+            int v = 1;
+            const TValue *vt = L->ci->func + 2;
+            
+            unsigned int actual_i = l_castS2U(k) - 1;
+            unsigned int asize = t->sizearray;
+            
+            if (actual_i < asize) {
+                TValue *slot = &t->array[actual_i];
+                setbvalue(slot, v);
+            } else if (actual_i < 2*asize) {
+                unsigned int hsize = sizenode(t);
+                luaH_resize(L, t, 2*asize, hsize);
+                TValue *slot = &t->array[actual_i];
+                setbvalue(slot, v);
+            } else {
+                TValue *slot = (TValue *) luaH_getint(t, k);
+                TValue vk; setivalue(&vk, k);
+                TValue vv; setbvalue(&vv, v);
+                luaV_finishset(L, vt, &vk, &vv, slot);
+            }
+        }
+        
     }
 
     lua_Integer local_nprimes;
@@ -70,9 +112,21 @@ static void sieve_titancall(lua_State *L)
     
         int tmp_0;
         {
-            const TValue * v = luaH_getint(local_is_prime, local_n);
-            if (!ttisboolean(v)) { titan_type_error(L, __LINE__); }
-            tmp_0 = bvalue(v);
+            Table *t = local_is_prime;
+            lua_Integer k = local_n;
+            
+            unsigned int actual_i = l_castS2U(k) - 1;
+            unsigned int asize = t->sizearray;
+            
+            TValue *slot = &t->array[actual_i];
+            if (actual_i < asize) {
+                slot = &t->array[actual_i];
+            } else {
+                slot = (TValue *) luaH_getint(local_is_prime, local_n);
+            }
+            
+            if (!ttisboolean(slot)) { titan_type_error(L, __LINE__); }
+            tmp_0 = bvalue(slot);
         }
 
         if (tmp_0) {
@@ -80,9 +134,30 @@ static void sieve_titancall(lua_State *L)
             local_nprimes = local_nprimes + 1;
             
             {
-                TValue v; setivalue(&v, local_n);
-                luaH_setint(L, local_primes, local_nprimes, &v);
+                Table *t = local_primes;
+                lua_Integer k = local_nprimes;
+                lua_Integer v = local_n;
+                const TValue *vt = L->ci->func + 3;
+                
+                unsigned int actual_i = l_castS2U(k) - 1;
+                unsigned int asize = t->sizearray;
+                
+                if (actual_i < asize) {
+                    TValue *slot = &t->array[actual_i];
+                    setivalue(slot, v);
+                } else if (actual_i < 2*asize) {
+                    unsigned int hsize = sizenode(t);
+                    luaH_resize(L, t, 2*asize, hsize);
+                    TValue *slot = &t->array[actual_i];
+                    setivalue(slot, v);
+                } else {
+                    TValue *slot = (TValue *) luaH_getint(t, k);
+                    TValue vk; setivalue(&vk, k);
+                    TValue vv; setivalue(&vv, v);
+                    luaV_finishset(L, vt, &vk, &vv, slot);
+                }
             }
+            
             
             lua_Integer tmp_1;
             {
@@ -90,11 +165,32 @@ static void sieve_titancall(lua_State *L)
             }
             
             for (lua_Integer local_m = tmp_1; local_m <= local_maxn; local_m += local_n) {
-
+                
                 {
-                    TValue v; setbvalue(&v, 0);
-                    luaH_setint(L, local_is_prime, local_m, &v);
+                    Table *t = local_is_prime;
+                    lua_Integer k = local_m;
+                    int v = 0;
+                    const TValue *vt = L->ci->func + 2;
+                    
+                    unsigned int actual_i = l_castS2U(k) - 1;
+                    unsigned int asize = t->sizearray;
+                    
+                    if (actual_i < asize) {
+                        TValue *slot = &t->array[actual_i];
+                        setbvalue(slot, v);
+                    } else if (actual_i < 2*asize) {
+                        unsigned int hsize = sizenode(t);
+                        luaH_resize(L, t, 2*asize, hsize);
+                        TValue *slot = &t->array[actual_i];
+                        setbvalue(slot, v);
+                    } else {
+                        TValue *slot = (TValue *) luaH_getint(t, k);
+                        TValue vk; setivalue(&vk, k);
+                        TValue vv; setbvalue(&vv, v);
+                        luaV_finishset(L, vt, &vk, &vv, slot);
+                    }
                 }
+                
             }
         }
     }
